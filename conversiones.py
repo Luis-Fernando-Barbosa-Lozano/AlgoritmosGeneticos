@@ -73,7 +73,6 @@ for ind in valReal:
     expr = expr.replace('x', str(ind))  # Sustituimos X por el valor real del individuo
 
     # Evalúa la expresión de manera segura usando las funciones matemáticas
-
     resultado = eval(expr, {"__builtins__": None}, math_functions)
     valAdap.append(round(resultado, 3))
 
