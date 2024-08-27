@@ -53,7 +53,7 @@ print('\n' + '>>>>>Los Valores reales son:', valReal)
 
 # Definir un diccionario de funciones matemáticas disponibles para eval, devolviendo resultados en grados
 math_functions = {
-    'sin': lambda x: math.degrees(math.sin(math.radians(x))),
+    'sen': lambda x: math.sin(math.radians(x)),
     'cos': lambda x: math.degrees(math.cos(math.radians(x))),
     'tan': lambda x: math.degrees(math.tan(math.radians(x))),
     'sqrt': math.sqrt,
@@ -82,3 +82,13 @@ print('\n' + '>>>>>Los valores adaptados son:', valAdap)
 # Método de ruleta (ordenar de mayor a menor)
 valAdap.sort(reverse= True) #Ordenar la lista de mayor a menor
 print('\n' + '>>>>>Ruleta:',valAdap, '\n')
+
+#Solicitamos al usuario el % de cruces que quiere tener en el algoritmo y especificamos que usaremos un float
+porcentajeCruce: float = input("Qué porcentaje de cruce quieres manejar")
+
+#Calculamos con una regla de 3 el número de cruces que corresponde con el porcentaje establecido
+noCruces = round((porcentajeCruce * len(lstBinaria))/100) # >>> (% de Cruce x total de individuos) / 100%
+#Con round redondeamos al entero más próximo el posible valor flotante resultante de la operación
+
+#Pedimos que elijan un tipo de cruce
+tipoCruce = input("Qué tió de cruce deseas hacer? 1= Cruce de un punto | 2= Cruce de dos puntos")
