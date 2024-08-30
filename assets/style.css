@@ -1,0 +1,105 @@
+.container{
+    max-width: 100%;
+    margin: 0%;
+    padding: 0%;
+    background: linear-gradient(90deg, rgb(210, 195, 206)0%, rgb(96, 46, 83) 100%);
+}
+
+.honk{
+  font-family: "Honk", system-ui;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings: 
+    "MORF" 15,
+    "SHLN" 50;
+}
+
+.header{
+    background-color: #49103ab4;
+    display: flex;
+    align-items: center;
+    color: white;
+    justify-content: center;
+    width: 100%;
+    height: 20%;
+    margin: 0;
+    
+    text-align: center;
+
+}
+
+.header h1{
+    font-family: "Honk", system-ui;
+    font-size: 3rem;
+    color: #ddda30;
+}
+
+.main{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    align-items: center;
+}
+.valores{
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+    font-size: larger;
+    color: #ffffff;
+}
+.form-datos{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 10px;
+    animation: ease-in 1s slideInFromLeft;
+}
+label{
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 1.2rem;
+    color: #ffffff;
+    font-weight: 800;   
+}
+input, button{
+    border-radius: 25px;
+    border: 1px solid #912353;
+    width: 180px;
+}
+.table{
+    border: 1px solid black;
+}
+
+.btn-secondary{
+    background-color: #912339;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-family: "Honk", system-ui;
+    font-weight: 400;
+    font-style: normal;
+    font-variation-settings: 
+    "MORF" 15,
+    "SHLN" 50;
+}
+.btn-primary{
+    background-color: #49103a;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-family: "Honk", system-ui;
+    font-weight: 400;
+    font-style: normal;
+    font-variation-settings: 
+    "MORF" 15,
+    "SHLN" 50;
+}
