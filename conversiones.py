@@ -53,7 +53,8 @@ def convercion_adaptado(valReal, fnAdaptacion, lstMinMax):
 
     # Calculamos el valor de adaptación en la función
     expr = re.sub(r'(\d)([a-zA-Z])', r'\1*\2', fnAdaptacion)
-    adaptacion = expr = expr.replace('x', str(lstMinMax[0]))
+    expr = expr.replace('x', str(lstMinMax[0]))
+    adaptacion = eval(expr, {"__builtins__": None}, math_functions)
 
     return valAdap, adaptacion
 
@@ -63,20 +64,20 @@ def seleccion_ruleta(valAdap):
     return valAdap
 
 # Algoritmo para cruce de un punto
-def cruce_unpunto(lst_ruleta, cruces):
+def cruce_unpunto(lst_binaria, cruces, l):
     cont = 0
     lista_cruces = []
 
     # Elegimos aleatoriamente un bit de corte
-    bit_corte = random.randint(1, len(lst_ruleta[0]) - 1)  # El bit e corte no puede ser el primer ni el último bit
+    bit_corte = random.randint(1, l - 1)  # El bit e corte no puede ser el primer ni el último bit
 
     while cont != cruces:
-        padre1 = lst_ruleta[random.randint(0, len(lst_ruleta) - 1)]
+        padre1 = lst_binaria[random.randint(0, len(lst_binaria) - 1)]
         padre2 = padre1
 
         # nos aseguramos que ambos padres sean diferentes
         while padre2 == padre1:
-            padre2 = lst_ruleta[random.randint(0, len(lst_ruleta) - 1)]
+            padre2 = lst_binaria[random.randint(0, len(lst_binaria) - 1)]
 
         # Obtenemos los hijos; inicio1 + final2 e inicio2 + final1
         hijo1 = padre1[:bit_corte] + padre2[bit_corte:]
@@ -93,12 +94,12 @@ def cruce_unpunto(lst_ruleta, cruces):
         peor_padre_val, peor_padre = (padre1_val, padre1) if padre1_val < padre2_val else (padre2_val, padre2)
 
         # Reemplazamos al padre más débil con el hijo más fuerte
-        peor_padre_indice = lst_ruleta.index(peor_padre)
-        lst_ruleta[peor_padre_indice] = mejor_hijo
+        peor_padre_indice = lst_binaria.index(peor_padre)
+        lst_binaria[peor_padre_indice] = mejor_hijo
 
         cont += 1
 
-    return lst_ruleta
+    return lst_binaria
 
 def main():
     # Entrada de Individuos en formato binario separado por comas
@@ -148,7 +149,7 @@ def main():
     print('\n' + '>>>>>Ruleta:', ruleta, '\n')
 
     # Solicitamos al usuario el % de cruces que quiere tener en el algoritmo y especificamos que usaremos un float
-    porcentajeCruce: float = input("Qué porcentaje de cruce quieres manejar")
+    porcentajeCruce =  float(input("Qué porcentaje de cruce quieres manejar"))
 
     # Calculamos con una regla de 3 el número de cruces que corresponde con el porcentaje establecido
     noCruces = round((porcentajeCruce * len(lstBinaria)) / 100)  # >>> (% de Cruce x total de individuos) / 100%
@@ -157,7 +158,7 @@ def main():
     tipoCruce = input("Qué tipo de cruce deseas hacer? 1 = Cruce de un punto | 2 = Cruce de dos puntos")
 
     if tipoCruce == '1':
-        cruce_unpunto(ruleta, noCruces)
+        print(cruce_unpunto(lstBinaria, noCruces, l))
     else:
         print("cruce de dos puntos")
 
