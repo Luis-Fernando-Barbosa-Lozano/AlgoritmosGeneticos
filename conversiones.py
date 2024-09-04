@@ -1,4 +1,5 @@
 import math
+import random
 import re
 
 # Validando que todos los individuos tengan la misma longitud
@@ -56,10 +57,48 @@ def convercion_adaptado(valReal, fnAdaptacion, lstMinMax):
 
     return valAdap, adaptacion
 
-def metodo_ruleta(valAdap):
-    # Método de ruleta (ordenar de mayor a menor)
+# Selección ruleta (ordenar de mayor a menor)
+def seleccion_ruleta(valAdap):
     valAdap.sort(reverse=True)  # Ordenar la lista de mayor a menor
     return valAdap
+
+# Algoritmo para cruce de un punto
+def cruce_unpunto(lst_ruleta, cruces):
+    cont = 0
+    lista_cruces = []
+
+    # Elegimos aleatoriamente un bit de corte
+    bit_corte = random.randint(1, len(lst_ruleta[0]) - 1)  # El bit e corte no puede ser el primer ni el último bit
+
+    while cont != cruces:
+        padre1 = lst_ruleta[random.randint(0, len(lst_ruleta) - 1)]
+        padre2 = padre1
+
+        # nos aseguramos que ambos padres sean diferentes
+        while padre2 == padre1:
+            padre2 = lst_ruleta[random.randint(0, len(lst_ruleta) - 1)]
+
+        # Obtenemos los hijos; inicio1 + final2 e inicio2 + final1
+        hijo1 = padre1[:bit_corte] + padre2[bit_corte:]
+        hijo2 = padre2[:bit_corte] + padre1[bit_corte:]
+
+        # Convertimos los hijos y padres a decimal para comparar su "fuerza"
+        hijo1_val = int(hijo1, 2)
+        hijo2_val = int(hijo2, 2)
+        padre1_val = int(padre1, 2)
+        padre2_val = int(padre2, 2)
+
+        # Seleccionamos al hijo más fuerte y el padre más débil
+        mejor_hijo_val, mejor_hijo = (hijo1_val, hijo1) if hijo1_val > hijo2_val else (hijo2_val, hijo2)
+        peor_padre_val, peor_padre = (padre1_val, padre1) if padre1_val < padre2_val else (padre2_val, padre2)
+
+        # Reemplazamos al padre más débil con el hijo más fuerte
+        peor_padre_indice = lst_ruleta.index(peor_padre)
+        lst_ruleta[peor_padre_indice] = mejor_hijo
+
+        cont += 1
+
+    return lst_ruleta
 
 def main():
     # Entrada de Individuos en formato binario separado por comas
@@ -104,8 +143,9 @@ def main():
     print('\n' + '>>>>>Los valores adaptados son:', adaptados)
     print('\n' + '>>>>>El valor que los individuos deben superar es:', adaptacion)
 
-    # Imprime el método de ruleta
-    print('\n' + '>>>>>Ruleta:', metodo_ruleta(adaptados), '\n')
+    # Obtenemos e imprimimos la Selección ruleta
+    ruleta = seleccion_ruleta(adaptados)
+    print('\n' + '>>>>>Ruleta:', ruleta, '\n')
 
     # Solicitamos al usuario el % de cruces que quiere tener en el algoritmo y especificamos que usaremos un float
     porcentajeCruce: float = input("Qué porcentaje de cruce quieres manejar")
@@ -114,7 +154,12 @@ def main():
     noCruces = round((porcentajeCruce * len(lstBinaria)) / 100)  # >>> (% de Cruce x total de individuos) / 100%
 
     # Pedimos que elijan un tipo de cruce
-    tipoCruce = input("Qué tipo de cruce deseas hacer? 1= Cruce de un punto | 2= Cruce de dos puntos")
+    tipoCruce = input("Qué tipo de cruce deseas hacer? 1 = Cruce de un punto | 2 = Cruce de dos puntos")
+
+    if tipoCruce == '1':
+        cruce_unpunto(ruleta, noCruces)
+    else:
+        print("cruce de dos puntos")
 
 if __name__ == "__main__":
     main()
