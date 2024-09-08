@@ -1,6 +1,8 @@
 import math
 import random
 import re
+from turtledemo.paint import switchupdown
+
 
 # Validando que todos los individuos tengan la misma longitud
 def valida_longitud(lstBinaria, l):
@@ -63,10 +65,27 @@ def seleccion_ruleta(valAdap):
     valAdap.sort(reverse=True)  # Ordenar la lista de mayor a menor
     return valAdap
 
+# Algoritmo para comparar y reemplazar en la lista
+def reemplazar_padres(hijo1, hijo2, padre1, padre2, lst_binaria):
+    # Convertimos los hijos y padres a decimal para comparar su "fuerza"
+    hijo1_val = int(hijo1, 2)
+    hijo2_val = int(hijo2, 2)
+    padre1_val = int(padre1, 2)
+    padre2_val = int(padre2, 2)
+
+    # Seleccionamos al hijo más fuerte y el padre más débil
+    mejor_hijo_val, mejor_hijo = (hijo1_val, hijo1) if hijo1_val > hijo2_val else (hijo2_val, hijo2)
+    peor_padre_val, peor_padre = (padre1_val, padre1) if padre1_val < padre2_val else (padre2_val, padre2)
+
+    # Reemplazamos al padre más débil con el hijo más fuerte
+    peor_padre_indice = lst_binaria.index(peor_padre)
+    lst_binaria[peor_padre_indice] = mejor_hijo
+
+    return lst_binaria
+
 # Algoritmo para cruce de un punto
 def cruce_unpunto(lst_binaria, cruces, l):
     cont = 0
-    lista_cruces = []
 
     # Elegimos aleatoriamente un bit de corte
     bit_corte = random.randint(1, l - 1)  # El bit e corte no puede ser el primer ni el último bit
@@ -83,19 +102,32 @@ def cruce_unpunto(lst_binaria, cruces, l):
         hijo1 = padre1[:bit_corte] + padre2[bit_corte:]
         hijo2 = padre2[:bit_corte] + padre1[bit_corte:]
 
-        # Convertimos los hijos y padres a decimal para comparar su "fuerza"
-        hijo1_val = int(hijo1, 2)
-        hijo2_val = int(hijo2, 2)
-        padre1_val = int(padre1, 2)
-        padre2_val = int(padre2, 2)
+        lst_binaria = reemplazar_padres(hijo1, hijo2, padre1, padre2, lst_binaria)
 
-        # Seleccionamos al hijo más fuerte y el padre más débil
-        mejor_hijo_val, mejor_hijo = (hijo1_val, hijo1) if hijo1_val > hijo2_val else (hijo2_val, hijo2)
-        peor_padre_val, peor_padre = (padre1_val, padre1) if padre1_val < padre2_val else (padre2_val, padre2)
+        cont += 1
 
-        # Reemplazamos al padre más débil con el hijo más fuerte
-        peor_padre_indice = lst_binaria.index(peor_padre)
-        lst_binaria[peor_padre_indice] = mejor_hijo
+    return lst_binaria
+
+# Algoritmo para cruce de dos puntos
+def cruce_dosPuntos(lst_binaria, cruces, l):
+    cont = 0
+    corte_q, corte_b = random.sample(range(1, l - 1), 2)
+
+    # Aseguramos que corte_b siempre sea menor que corte_q
+    if corte_b > corte_q:
+        corte_b, corte_q = corte_q, corte_b
+
+    while cont != cruces:
+        padre1 = lst_binaria[random.randint(0, len(lst_binaria) - 1)]
+        padre2 = padre1
+
+        while padre2 == padre1:
+            padre2 = lst_binaria[random.randint(0, len(lst_binaria) - 1)]
+
+        hijo1 = padre1[:corte_q] + padre2[corte_q:corte_b] + padre1[corte_b:]
+        hijo2 = padre2[:corte_q] + padre1[corte_q:corte_b] + padre2[corte_b:]
+
+        lst_binaria = reemplazar_padres(hijo1, hijo2, padre1, padre2, lst_binaria)
 
         cont += 1
 
@@ -155,12 +187,15 @@ def main():
     noCruces = round((porcentajeCruce * len(lstBinaria)) / 100)  # >>> (% de Cruce x total de individuos) / 100%
 
     # Pedimos que elijan un tipo de cruce
-    tipoCruce = input("Qué tipo de cruce deseas hacer? 1 = Cruce de un punto | 2 = Cruce de dos puntos")
+    tipo_cruce = int(input("Qué tipo de cruce deseas hacer? 1 = Cruce de un punto | 2 = Cruce de dos puntos"))
 
-    if tipoCruce == '1':
-        print(cruce_unpunto(lstBinaria, noCruces, l))
-    else:
-        print("cruce de dos puntos")
+    switch = {1:cruce_unpunto, 2:cruce_dosPuntos}
+
+    # Usar get() con una función por defecto si 'tipo_cruce' no existe
+    funcion_cruce = switch.get(tipo_cruce, lambda *args: "Opción no válida")
+
+    # Ejecutar la función seleccionada con los parámetros
+    print(funcion_cruce(lstBinaria, noCruces, l))
 
 if __name__ == "__main__":
     main()
