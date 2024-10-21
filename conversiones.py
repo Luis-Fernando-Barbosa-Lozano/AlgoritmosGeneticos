@@ -213,85 +213,63 @@ def encontrar_mejores(lst_binaria, valor_adaptacion):
 
     return mejores
 
+
+def generar_individuos_aleatorios(num_individuos, longitud):
+    """Genera una lista de individuos binarios aleatorios."""
+    individuos = [''.join(random.choice('01') for _ in range(longitud)) for _ in range(num_individuos)]
+    return individuos
+
 def main():
-    # Entrada de Individuos en formato binario separado por comas
-    indBin = input('Ingrese individuos binarios separados por comas>>> ')
+    # Generación de 10,000 individuos con longitud binaria especificada
+    longitud_binaria = int(input("Ingrese la longitud de los individuos binarios >>> "))
+    lstBinaria = generar_individuos_aleatorios(500, longitud_binaria)
+    print(f"Se generaron {len(lstBinaria)} individuos aleatorios.")
 
-    # Obteniendo la Función de activación
-    fnAdap = input('ingrese la función de adaptación: f(x)= ')
+    fnAdap = input('Ingrese la función de adaptación: f(x)= ')
+    minMax = input('Ingrese el máximo y el mínimo separados por comas>>> ')
 
-    # Obteniendo el Mínimo y Máximo de la función
-    minMax = input('ingrese el máximo y el mínimo separados por comas>>> ')
-
-    # Eliminando posibles espacios en blanco entre cada valor
-    indSnEsp = indBin.replace(' ', '')
     fnAdapSnEsp = fnAdap.replace(' ', '')
     minMaxSnEsp = minMax.replace(' ', '')
+    lstMinMax = [int(i) for i in minMaxSnEsp.split(',')]
 
-    # Creando listas de los datos sin espacios (Parametro para separar; las comas)
-    lstBinaria = indSnEsp.split(',')
-    lstMinMax = [int(i) for i in minMaxSnEsp.split(',')]  # Conversión a entero
+    valida_longitud(lstBinaria, longitud_binaria)
 
-    # Obteniendo 'L'
-    l = len(lstBinaria[0])
-
-    valida_longitud(lstBinaria, l)
-
-    # Comprobando Máximos y mínimos, siempre en la posición '0' debe ir el máximo
     if lstMinMax[0] < lstMinMax[1]:
-        temp = lstMinMax[0]
-        lstMinMax[0] = lstMinMax[1]
-        lstMinMax[1] = temp
+        lstMinMax[0], lstMinMax[1] = lstMinMax[1], lstMinMax[0]
 
-    # Imprimiendo el resultado de la conversión
-    decimales = convercion_decimal(lstBinaria)
-    print('\n' + '>>>>>Los individuos en decimal son:', decimales)
+    porcentaje_convergencia = 0
 
-    # Imprimimos el valor real de los individuos
-    reales = convercion_real(decimales, lstMinMax, l)
-    print('\n' + '>>>>>Los Valores reales son:', reales)
+    while porcentaje_convergencia < 70:
+        n = 1
+        print("\nIteración en proceso...")
+        print("generación:", n)
+        # Conversión y cálculo de adaptación
+        decimales = convercion_decimal(lstBinaria)
+        reales = convercion_real(decimales, lstMinMax, longitud_binaria)
+        adaptados, adaptacion = convercion_adaptado(reales, fnAdapSnEsp, lstMinMax)
 
-    # Imprime los valores de adaptación
-    adaptados, adaptacion = convercion_adaptado(reales, fnAdapSnEsp, lstMinMax)
-    print('\n' + '>>>>>Los valores adaptados son:', adaptados)
-    print('\n' + '>>>>>El valor que los individuos deben superar es:', adaptacion)
+        porcentajeCruce = int(input("Qué porcentaje de cruce quieres manejar >>> "))
+        noCruces = round((porcentajeCruce * len(lstBinaria)) / 100)
 
-    # Obtenemos e imprimimos la Selección ruleta
-    ruleta = seleccion_ruleta(adaptados)
-    print('\n' + '>>>>>Ruleta:', ruleta, '\n')
+        tipo_cruce = int(input("Qué tipo de cruce deseas hacer? 1 = Un Punto | 2 = Dos Puntos | 3 = Uniforme >>> "))
+        switch_cruce = {1: cruce_unpunto, 2: cruce_dosPuntos, 3: cruce_uniforme}
+        funcion_cruce = switch_cruce.get(tipo_cruce, lambda *args: "Opción no válida")
+        lstBinaria = funcion_cruce(lstBinaria, noCruces, longitud_binaria)
 
-    # Solicitamos al usuario el % de cruces que quiere tener en el algoritmo
-    porcentajeCruce =  int(input("Qué porcentaje de cruce quieres manejar"))
+        porcentaje_mutacion = int(input("Qué porcentaje de mutación quieres manejar >>> "))
+        num_mutaciones = round((porcentaje_mutacion * len(lstBinaria)) / 100)
 
-    # Calculamos con una regla de 3 el número de cruces que corresponde con el porcentaje establecido
-    noCruces = round((porcentajeCruce * len(lstBinaria)) / 100)  # >>> (% de Cruce x total de individuos) / 100%
+        funcion_mutacion = mutacion_simple  # Solo tienes un tipo de mutación
+        lstBinaria = funcion_mutacion(lstBinaria, num_mutaciones, longitud_binaria)
 
-    # Pedimos que elijan un tipo de cruce
-    tipo_cruce = int(input("Qué tipo de cruce deseas hacer? 1 = Cruce de Un Punto | 2 = Cruce de Dos Puntos | 3 = Cruce Uniforme" + "\n" + ">>>"))
-    switch_cruce = {1:cruce_unpunto, 2:cruce_dosPuntos, 3:cruce_uniforme}
+        # Encontramos los mejores individuos
+        total_adaptados = encontrar_mejores(lstBinaria, adaptacion)
+        n += 1
 
-    # Pedimos que elijan un tipo de mutación
-    tipo_mutacion = int(input("Qué tipo de mutación deseas utilizar? 1 = Mutación Simple" + "\n" + ">>>"))
-    switch_mutacion = {1: mutacion_simple}
+        # Calculamos el porcentaje de convergencia
+        porcentaje_convergencia = (len(total_adaptados) / len(lstBinaria)) * (100)
+        print(f"\nConvergencia alcanzada: {porcentaje_convergencia:.2f}%")
 
-    # Solicitamos al usuario el % de mutación que quiere tener en el algoritmo
-    porcentaje_mutacion = int(input("Qué porcentaje de mutación quieres manejar >>> "))
-
-    # Calculamos con una regla de 3 el número de individuos a mutar
-    num_mutaciones = round((porcentaje_mutacion * len(lstBinaria)) / 100)  # >>> (% de mutación x total de individuos) / 100%
-
-    # Usar get() con una función por defecto si 'tipo_cruce' no exist
-    funcion_cruce = switch_cruce.get(tipo_cruce, lambda *args: "Opción no válida")
-
-    # Ejecutar la función seleccionada con los parámetros
-    lstBinaria = funcion_cruce(lstBinaria, noCruces, l)
-
-    funcion_mutacion = switch_mutacion.get(tipo_mutacion, lambda *args: "Opción no válida")
-    lstBinaria = funcion_mutacion(lstBinaria, num_mutaciones, l)
-
-    total_adaptados = encontrar_mejores(lstBinaria, adaptacion)
-
-    print(f"Se encontraron {len(total_adaptados)} individuos adaptados")
     print(total_adaptados)
 
 if __name__ == "__main__":
