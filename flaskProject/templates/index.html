@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algoritmo Genético</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Algoritmo Genético</h1>
+        <form id="geneticForm">
+            <!-- Longitud Binaria -->
+            <label for="longitud_binaria">Longitud Binaria:</label>
+            <input type="number" id="longitud_binaria" name="longitud_binaria" required>
+
+            <!-- Min y Max -->
+            <label for="min_max">Rango (Min, Max):</label>
+            <input type="text" id="min_max" name="min_max" placeholder="Ejemplo: -10, 10" required>
+
+            <!-- Porcentaje de Cruce -->
+            <label for="porcentaje_cruce">Porcentaje de Cruce (%):</label>
+            <input type="number" id="porcentaje_cruce" name="porcentaje_cruce" min="0" max="100" required>
+
+            <!-- Tipo de Cruce -->
+            <label for="tipo_cruce">Tipo de Cruce:</label>
+            <select id="tipo_cruce" name="tipo_cruce" required>
+                <option value="1">Un Punto</option>
+                <option value="2">Dos Puntos</option>
+                <option value="3">Uniforme</option>
+            </select>
+
+            <!-- Porcentaje de Mutación -->
+            <label for="porcentaje_mutacion">Porcentaje de Mutación (%):</label>
+            <input type="number" id="porcentaje_mutacion" name="porcentaje_mutacion" min="0" max="100" required>
+
+            <!-- Función de Adaptación -->
+            <label for="funcion_adaptacion">Función de Adaptación:</label>
+            <input type="text" id="funcion_adaptacion" name="funcion_adaptacion" required>
+
+            <button type="submit">Ejecutar</button>
+        </form>
+    </div>
+
+    <div id="resultModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Resultados</h2>
+            <p id="resultMessage"></p>
+        </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
