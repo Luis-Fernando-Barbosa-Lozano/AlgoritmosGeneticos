@@ -6,12 +6,13 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-color: lightgray;
+    background-image: url("/static/img/Back.gif");
+    background-size: cover;
 }
 
 .container {
     text-align: center;
-    padding: 20px;
+    padding: 40px;
     background: #fff;
     box-shadow: 0 0 10px rgba(0, 0, 0, 10);
 }
