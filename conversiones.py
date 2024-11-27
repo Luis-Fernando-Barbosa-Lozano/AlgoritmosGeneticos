@@ -1,6 +1,10 @@
 import math
 import random
 import re
+from primerParcial.MutacionHeuristica import mutacion_heuristica as mutHeu
+from MutacionInversion import mutacion_por_inversion as mutInv
+from MutacionIntercambio import mutacion_por_intercambio as mutInt
+from MutacionJerarquica import seleccion_jerarquica as selJer
 
 # Validando que todos los individuos tengan la misma longitud
 def valida_longitud(lstBinaria, l):
@@ -88,25 +92,23 @@ def seleccion_ruleta(valAdap):
     valAdap.sort(reverse=True)  # Ordenar la lista de mayor a menor
     return valAdap
 
-# Selección Torneo
 def seleccion_torneo(valAdap):
-
     # Obteniendo el número de individuos participantes
-    n = random.randint(1, len(valAdap))
+    n = random.randint(2, len(valAdap))  # El mínimo debería ser 2 para comparar
 
+    # Seleccionar un subconjunto aleatorio de participantes
     torneo = random.sample(valAdap, n)
 
-    for i in range(len(torneo)):
-
+    while len(torneo) > 1:  # Mientras haya más de un individuo en el torneo
         ind1, ind2 = random.sample(range(len(torneo)), 2)
 
-        if valAdap[ind1] > valAdap[ind2]:
-            torneo.remove(ind2)
-
+        if torneo[ind1] > torneo[ind2]:
+            del torneo[ind2]  # Usar `del` en vez de `remove` para eliminar por índice
         else:
-            torneo.remove(ind1)
+            del torneo[ind1]
 
     return torneo
+
 
 # Algoritmo para comparar y reemplazar en la lista
 def reemplazar_padres(hijo1, hijo2, padre1, padre2, lst_binaria):
@@ -213,16 +215,14 @@ def encontrar_mejores(lst_binaria, valor_adaptacion):
 
     return mejores
 
-
 def generar_individuos_aleatorios(num_individuos, longitud):
-    """Genera una lista de individuos binarios aleatorios."""
     individuos = [''.join(random.choice('01') for _ in range(longitud)) for _ in range(num_individuos)]
     return individuos
 
 def main():
     # Generación de 10,000 individuos con longitud binaria especificada
-    longitud_binaria = int(input("Ingrese la longitud de los individuos binarios >>> "))
-    lstBinaria = generar_individuos_aleatorios(500, longitud_binaria)
+    longitud_binaria = 24
+    lstBinaria = generar_individuos_aleatorios(12563, longitud_binaria)
     print(f"Se generaron {len(lstBinaria)} individuos aleatorios.")
 
     fnAdap = input('Ingrese la función de adaptación: f(x)= ')
@@ -239,27 +239,41 @@ def main():
 
     porcentaje_convergencia = 0
 
-    while porcentaje_convergencia < 70:
+    while porcentaje_convergencia < 80:
         n = 1
         print("\nIteración en proceso...")
         print("generación:", n)
+
         # Conversión y cálculo de adaptación
         decimales = convercion_decimal(lstBinaria)
         reales = convercion_real(decimales, lstMinMax, longitud_binaria)
         adaptados, adaptacion = convercion_adaptado(reales, fnAdapSnEsp, lstMinMax)
 
-        porcentajeCruce = int(input("Qué porcentaje de cruce quieres manejar >>> "))
+        # Selección de tipo de cruce y mutación
+        porcentajeCruce = 75
         noCruces = round((porcentajeCruce * len(lstBinaria)) / 100)
 
-        tipo_cruce = int(input("Qué tipo de cruce deseas hacer? 1 = Un Punto | 2 = Dos Puntos | 3 = Uniforme >>> "))
+        tipo_cruce = int(input("Qué tipo de cruce deseas hacer? \n 1 = Un Punto | 2 = Dos Puntos | 3 = Uniforme >>> "))
         switch_cruce = {1: cruce_unpunto, 2: cruce_dosPuntos, 3: cruce_uniforme}
         funcion_cruce = switch_cruce.get(tipo_cruce, lambda *args: "Opción no válida")
         lstBinaria = funcion_cruce(lstBinaria, noCruces, longitud_binaria)
 
-        porcentaje_mutacion = int(input("Qué porcentaje de mutación quieres manejar >>> "))
+        # **Aquí pedimos al usuario que seleccione el tipo de selección**
+        tipo_seleccion = int(input("Qué tipo de selección quieres usar? \n 1 = Ruleta | 2 = Torneo | 3 = Jerarquia>>> "))
+        switch_seleccion = {1: seleccion_ruleta, 2: seleccion_torneo, 3: selJer}
+        funcion_seleccion = switch_seleccion.get(tipo_seleccion, lambda *args: "Opción no válida")
+        seleccionados = funcion_seleccion(adaptados)
+
+        # Mutación
+        porcentaje_mutacion = 10
         num_mutaciones = round((porcentaje_mutacion * len(lstBinaria)) / 100)
 
-        funcion_mutacion = mutacion_simple  # Solo tienes un tipo de mutación
+        tipo_mutacion = int(
+            input("Qué tipo de mutación quieres usar? \n 1 = Simple | 2 = Heurística | 3 = Por Intercambio "
+                  "| 4 = Por Inversión >>> "))
+        switch_mutacion = {1: mutacion_simple, 2: mutHeu, 3: mutInt, 4: mutInv}
+        funcion_mutacion = switch_mutacion.get(tipo_mutacion,
+                                               lambda *args: "Opción no válida")  # Solo tienes un tipo de mutación
         lstBinaria = funcion_mutacion(lstBinaria, num_mutaciones, longitud_binaria)
 
         # Encontramos los mejores individuos
@@ -270,7 +284,8 @@ def main():
         porcentaje_convergencia = (len(total_adaptados) / len(lstBinaria)) * (100)
         print(f"\nConvergencia alcanzada: {porcentaje_convergencia:.2f}%")
 
-    print(total_adaptados)
+    #print(total_adaptados)
+
 
 if __name__ == "__main__":
     main()
